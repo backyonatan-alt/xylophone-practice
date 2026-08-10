@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#efe9df;font-family:'Rubik',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#3B5FA0}a:hover{color:#2c4a80}
+@media print{
+  body{background:#fff}
+  [data-noprint]{display:none!important}
+  [data-app],[data-scroll]{height:auto!important;overflow:visible!important;box-shadow:none!important}
+}
+</style>
+</helmet>
+<div data-app="1" dir="rtl" style="height:100dvh;max-width:540px;margin:0 auto;background:#faf7f1;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 0 40px rgba(60,45,20,.12);color:#2b2620">
+
+<sc-if value="{{ isList }}" hint-placeholder-val="{{ true }}">
+  <div style="padding:28px 22px 18px">
+    <div dir="ltr" style="display:flex;gap:5px;align-items:flex-end;margin-bottom:18px">
+      <sc-for list="{{ refBars }}" as="bar" hint-placeholder-count="8">
+        <div style="width:34px;height:{{ bar.bigH }}px;border-radius:6px;background:{{ bar.color }};display:flex;align-items:flex-end;justify-content:center;padding-bottom:5px;color:{{ bar.fg }};font-size:13px;font-weight:700">{{ bar.label }}</div>
+      </sc-for>
+    </div>
+    <h1 style="margin:0;font-size:28px;font-weight:900;letter-spacing:-.5px">קסילופון בצבעים</h1>
+    <p style="margin:6px 0 0;font-size:15px;color:#7d7466">מדריך נגינה חזותי לשירי ילדים · בלי תווים, רק צבעים</p>
+  </div>
+  <div style="flex:1;overflow-y:auto;padding:4px 18px 28px;display:flex;flex-direction:column;gap:12px">
+    <sc-for list="{{ songs }}" as="s" hint-placeholder-count="5">
+      <div onClick="{{ s.open }}" role="button" style="background:#fff;border:1px solid #e8e1d5;border-radius:16px;padding:16px 18px;cursor:pointer;display:flex;flex-direction:column;gap:10px" style-hover="border-color:#c9bfae;box-shadow:0 4px 14px rgba(60,45,20,.08)" style-active="transform:scale(.985)">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <div style="font-size:19px;font-weight:700">{{ s.title }}</div>
+          <div style="font-size:12.5px;font-weight:700;padding:4px 10px;border-radius:99px;background:{{ s.diffBg }};color:{{ s.diffFg }};white-space:nowrap">{{ s.diff }}</div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <div dir="ltr" style="display:flex;gap:4px">
+            <sc-for list="{{ s.preview }}" as="p" hint-placeholder-count="8">
+              <div style="width:14px;height:22px;border-radius:4px;background:{{ p }}"></div>
+            </sc-for>
+          </div>
+          <div style="font-size:13px;color:#8d8375">{{ s.meta }}</div>
+        </div>
+      </div>
+    </sc-for>
+    
+  </div>
+</sc-if>
+
+<sc-if value="{{ isSong }}" hint-placeholder-val="{{ false }}">
+  <div data-noprint="1" style="display:flex;align-items:center;gap:10px;padding:14px 16px 10px">
+    <button onClick="{{ goHome }}" style="border:1px solid #e0d8c9;background:#fff;border-radius:12px;width:42px;height:42px;font-size:20px;cursor:pointer;color:#2b2620;font-family:inherit" style-hover="background:#f3eee4">→</button>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:19px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ songTitle }}</div>
+      <div style="font-size:12.5px;color:#8d8375">{{ songMeta }}</div>
+    </div>
+    <button onClick="{{ restart }}" style="border:1px solid #e0d8c9;background:#fff;border-radius:12px;height:42px;padding:0 14px;font-size:13.5px;font-weight:700;cursor:pointer;color:#2b2620;font-family:inherit" style-hover="background:#f3eee4">מהתחלה</button>
+  </div>
+
+  <div data-noprint="1" style="display:flex;gap:4px;margin:2px 16px 10px;background:#efe9dd;border-radius:12px;padding:4px">
+    <button onClick="{{ setRead }}" style="flex:1;border:none;border-radius:9px;height:38px;font-size:14.5px;font-weight:700;cursor:pointer;font-family:inherit;background:{{ readTabBg }};color:{{ readTabFg }}">תווים</button>
+    <button onClick="{{ setAuto }}" style="flex:1;border:none;border-radius:9px;height:38px;font-size:14.5px;font-weight:700;cursor:pointer;font-family:inherit;background:{{ autoTabBg }};color:{{ autoTabFg }}">ניגון אוטומטי</button>
+  </div>
+
+  <div dir="ltr" style="display:flex;gap:4px;align-items:flex-end;padding:6px 16px 12px;border-bottom:1px solid #eee7da">
+    <sc-for list="{{ refBars }}" as="bar" hint-placeholder-count="8">
+      <div style="flex:1;height:{{ bar.h }}px;border-radius:5px;background:{{ bar.color }};display:flex;align-items:flex-end;justify-content:center;padding-bottom:3px;color:{{ bar.fg }};font-size:11px;font-weight:700;box-shadow:{{ bar.ring }};transition:box-shadow .15s">{{ bar.label }}</div>
+    </sc-for>
+  </div>
+
+  <div data-scroll="1" ref="{{ scrollRef }}" style="flex:1;overflow-y:auto;position:relative;padding:20px 16px 30px;display:flex;flex-direction:column;gap:26px">
+    <sc-for list="{{ phrases }}" as="ph" hint-placeholder-count="4">
+      <div dir="{{ songDir }}" style="display:flex;flex-wrap:wrap;gap:9px;row-gap:18px;align-items:flex-start">
+        <sc-for list="{{ ph.notes }}" as="n" hint-placeholder-count="6">
+          <div ref="{{ n.setRef }}" onClick="{{ n.jump }}" style="width:{{ n.w }}px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;opacity:{{ n.op }};transition:opacity .2s">
+            <div style="width:100%;height:{{ n.h }}px;border-radius:11px;background:{{ n.bg }};color:{{ n.fg }};display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;box-shadow:{{ n.shadow }};transform:{{ n.tf }};transition:transform .18s,box-shadow .18s">{{ n.label }}</div>
+            <div dir="rtl" style="font-size:16px;font-weight:{{ n.sylW }};line-height:1.1;text-align:center">{{ n.syl }}</div>
+            <sc-if value="{{ n.hasSyl2 }}" hint-placeholder-val="{{ false }}">
+              <div dir="ltr" style="font-size:11.5px;color:#8d8375;line-height:1.1;text-align:center">{{ n.syl2 }}</div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </sc-for>
+  </div>
+
+  <sc-if value="{{ isAuto }}" hint-placeholder-val="{{ false }}">
+  <div data-noprint="1" style="border-top:1px solid #eee7da;background:#fff;padding:12px 16px calc(12px + env(safe-area-inset-bottom))">
+    <sc-if value="{{ finished }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="flex:1;font-size:18px;font-weight:900">סוף השיר — כל הכבוד!</div>
+        <button onClick="{{ togglePlay }}" style="border:none;background:#2b2620;color:#fff;border-radius:14px;height:56px;padding:0 24px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit" style-hover="background:#403a31">עוד פעם</button>
+      </div>
+    </sc-if>
+    <sc-if value="{{ notFinished }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button onClick="{{ togglePlay }}" style="border:{{ playBorder }};background:{{ playBg }};color:{{ playFg }};border-radius:14px;height:64px;padding:0 28px;font-size:18px;font-weight:900;cursor:pointer;font-family:inherit;flex:none" style-active="transform:scale(.97)">{{ playLabel }}</button>
+        <div style="flex:1;display:flex;align-items:center;gap:10px;min-width:0">
+          <div style="width:46px;height:46px;border-radius:12px;background:{{ curBg }};color:{{ curFg }};display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;flex:none">{{ curLabel }}</div>
+          <div style="min-width:0">
+            <div style="font-size:17px;font-weight:900;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ curSyl }}</div>
+            <div style="font-size:12px;color:#8d8375;white-space:nowrap">{{ progress }}</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex:none;width:110px">
+          <input type="range" dir="ltr" min="30" max="120" step="5" value="{{ bpm }}" onChange="{{ onBpm }}" style="width:100%;accent-color:#2b2620">
+          <div style="font-size:11.5px;color:#8d8375;white-space:nowrap">קצב: {{ bpm }} לדקה</div>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+  </sc-if>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:420,&quot;height&quot;:860},&quot;blockScale&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:1,&quot;min&quot;:0.75,&quot;max&quot;:1.5,&quot;step&quot;:0.05,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;תצוגה&quot;},&quot;colorOnly&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;תצוגה&quot;},&quot;bilingualDisplay&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;both&quot;,&quot;options&quot;:[&quot;both&quot;,&quot;he&quot;,&quot;en&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;מילים&quot;}}">
+class Component extends DCLogic {
+  state = { screen: 'list', songId: null, idx: 0, mode: 'read', playing: false, bpm: 60 };
+
+  bars() {
+    return [
+      { label: 'דו', full: 'דו נמוך', color: '#D94A45', fg: '#fff' },
+      { label: 'רה', full: 'רה', color: '#EF8A3C', fg: '#fff' },
+      { label: 'מי', full: 'מי', color: '#F3C64B', fg: '#6b4e00' },
+      { label: 'פה', full: 'פה', color: '#AED262', fg: '#3d5012' },
+      { label: 'סול', full: 'סול', color: '#2E7D3C', fg: '#fff' },
+      { label: 'לה', full: 'לה', color: '#82CBEC', fg: '#123a52' },
+      { label: 'סי', full: 'סי', color: '#2C4A8F', fg: '#fff' },
+      { label: 'דו׳', full: 'דו גבוה', color: '#8B5FB0', fg: '#fff' }
+    ];
+  }
+
+  songs() {
+    const N = (bar, syllable, duration) => ({ bar, syllable, duration: duration || 1 });
+    return [
+      { id: 'yonatan', title: 'יונתן הקטן', difficulty: 'easy', lyricsLang: 'he', phrases: [
+        { notes: [N(5,'יוֹ'),N(3,'נָ'),N(3,'תָן'),N(4,'הַ'),N(2,'קָ'),N(2,'טָן')] },
+        { notes: [N(1,'רָץ'),N(2,'בַּ'),N(3,'בֹּ'),N(4,'קֶר'),N(5,'אֶל'),N(5,'הַ'),N(5,'גָּן',2)] },
+        { notes: [N(5,'הוּא'),N(3,'טִי'),N(3,'פֵּס'),N(4,'עַל'),N(2,'הָ'),N(2,'עֵץ')] },
+        { notes: [N(1,'אֶפ'),N(3,'רוֹ'),N(5,'חִים'),N(5,'חִי'),N(1,'פֵּשׂ',2)] },
+        { notes: [N(2,'אוֹי'),N(2,'וַא'),N(2,'בוֹי'),N(2,'לוֹ'),N(3,'לַ'),N(4,'שּׁוֹ'),N(4,'בָב',2)] },
+        { notes: [N(3,'חוֹר'),N(3,'גָּ'),N(3,'דוֹל'),N(3,'בְּ'),N(4,'מִכ'),N(5,'נָ'),N(5,'סָיו',2)] },
+        { notes: [N(5,'מִן'),N(3,'הָ'),N(3,'עֵץ'),N(4,'הִת'),N(2,'גַּל'),N(2,'גֵּל')] },
+        { notes: [N(1,'וְ'),N(3,'עָנ'),N(5,'שׁוֹ'),N(5,'קִ'),N(1,'בֵּל',2)] }
+      ]},
+      { id: 'twinkle', title: 'Twinkle Twinkle Little Star', difficulty: 'easy', lyricsLang: 'both', phrases: [
+        { notes: [N(1,{he:'נִצ',en:'Twin'}),N(1,{he:'נוֹץ',en:'kle'}),N(5,{he:'נִצ',en:'twin'}),N(5,{he:'נוֹץ',en:'kle'}),N(6,{he:'כּוֹ',en:'lit'}),N(6,{he:'כָב',en:'tle'}),N(5,{he:'קָט',en:'star'},2)] },
+        { notes: [N(4,{he:'הוֹ',en:'how'}),N(4,{he:'אֵיךְ',en:'I'}),N(3,{he:'נִפ',en:'won'}),N(3,{he:'לָא',en:'der'}),N(2,{he:'מָה',en:'what'}),N(2,{he:'אַ',en:'you'}),N(1,{he:'תָּה',en:'are'},2)] },
+        { notes: [N(5,{he:'מֵ',en:'up'}),N(5,{he:'עַל',en:'a'}),N(4,{he:'הָ',en:'bove'}),N(4,{he:'עוֹ',en:'the'}),N(3,{he:'לָם',en:'world'}),N(3,{he:'גָּ',en:'so'}),N(2,{he:'בוֹהַּ',en:'high'},2)] },
+        { notes: [N(5,{he:'כְּמוֹ',en:'like'}),N(5,{he:'יַ',en:'a'}),N(4,{he:'הֲ',en:'dia'}),N(4,{he:'לוֹם',en:'mond'}),N(3,{he:'בַּ',en:'in'}),N(3,{he:'שָּׁ',en:'the'}),N(2,{he:'מַיִם',en:'sky'},2)] },
+        { notes: [N(1,{he:'נִצ',en:'Twin'}),N(1,{he:'נוֹץ',en:'kle'}),N(5,{he:'נִצ',en:'twin'}),N(5,{he:'נוֹץ',en:'kle'}),N(6,{he:'כּוֹ',en:'lit'}),N(6,{he:'כָב',en:'tle'}),N(5,{he:'קָט',en:'star'},2)] },
+        { notes: [N(4,{he:'הוֹ',en:'how'}),N(4,{he:'אֵיךְ',en:'I'}),N(3,{he:'נִפ',en:'won'}),N(3,{he:'לָא',en:'der'}),N(2,{he:'מָה',en:'what'}),N(2,{he:'אַ',en:'you'}),N(1,{he:'תָּה',en:'are'},2)] }
+      ]},
+      { id: 'mary', title: 'Mary Had a Little Lamb', difficulty: 'easy', lyricsLang: 'en', phrases: [
+        { notes: [N(3,'Ma'),N(2,'ry'),N(1,'had'),N(2,'a'),N(3,'lit'),N(3,'tle'),N(3,'lamb',2)] },
+        { notes: [N(2,'lit'),N(2,'tle'),N(2,'lamb',2),N(3,'lit'),N(5,'tle'),N(5,'lamb',2)] },
+        { notes: [N(3,'Ma'),N(2,'ry'),N(1,'had'),N(2,'a'),N(3,'lit'),N(3,'tle'),N(3,'lamb'),N(3,'its')] },
+        { notes: [N(2,'fleece'),N(2,'was'),N(3,'white'),N(2,'as'),N(1,'snow',2)] }
+      ]},
+      { id: 'uga', title: 'עוגה עוגה', difficulty: 'easy', lyricsLang: 'he', phrases: [
+        { notes: [N(5,'עוּ'),N(3,'גָה'),N(5,'עוּ'),N(3,'גָה'),N(5,'עוּ'),N(3,'גָה')] },
+        { notes: [N(4,'בַּ'),N(2,'מַע'),N(4,'גָל'),N(2,'נָ'),N(4,'חוּ'),N(2,'גָה')] },
+        { notes: [N(1,'נִס'),N(2,'תּוֹ'),N(3,'בְ'),N(4,'בָה'),N(5,'כָּל'),N(5,'הַ'),N(5,'יּוֹם',2)] },
+        { notes: [N(1,'עַד'),N(2,'אֲ'),N(3,'שֶׁר'),N(4,'נִמ'),N(5,'צָא'),N(5,'מָ'),N(5,'קוֹם',2)] },
+        { notes: [N(5,'לָ'),N(4,'שֶׁ'),N(3,'בֶת',2),N(2,'לָ'),N(1,'קוּם',2)] }
+      ]},
+      { id: 'hine', title: 'הנה מה טוב', difficulty: 'medium', lyricsLang: 'he', phrases: [
+        { notes: [N(1,'הִ'),N(3,'נֵּה'),N(5,'מַה'),N(5,'טּוֹב',2)] },
+        { notes: [N(6,'וּ'),N(5,'מַה'),N(4,'נָּ'),N(3,'עִים',2)] },
+        { notes: [N(2,'שֶׁ'),N(3,'בֶת'),N(4,'אַ'),N(2,'חִים',2)] },
+        { notes: [N(3,'גַּם'),N(2,'יָ'),N(1,'חַד',2)] }
+      ]}
+    ];
+  }
+
+  flat(song) {
+    const out = [];
+    song.phrases.forEach((ph, pi) => ph.notes.forEach(n => out.push(n)));
+    return out;
+  }
+
+  syl(note) {
+    const mode = this.props.bilingualDisplay ?? 'both';
+    if (typeof note.syllable === 'string') return { main: note.syllable, sub: null };
+    if (mode === 'he') return { main: note.syllable.he, sub: null };
+    if (mode === 'en') return { main: note.syllable.en, sub: null };
+    return { main: note.syllable.he, sub: note.syllable.en };
+  }
+
+  componentDidMount() {
+    this.noteEls = {};
+    this.onKey = (e) => {
+      if (this.state.screen !== 'song' || this.state.mode !== 'auto') return;
+      if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); this.togglePlay(); }
+    };
+    window.addEventListener('keydown', this.onKey);
+  }
+  componentWillUnmount() { window.removeEventListener('keydown', this.onKey); clearTimeout(this.timer); }
+
+  togglePlay() {
+    const song = this.songs().find(s => s.id === this.state.songId);
+    if (!song) return;
+    const total = this.flat(song).length;
+    if (this.state.playing) { clearTimeout(this.timer); this.setState({ playing: false }); }
+    else this.setState(s => ({ playing: true, idx: s.idx >= total ? 0 : s.idx }));
+  }
+
+  schedule() {
+    clearTimeout(this.timer);
+    const song = this.songs().find(s => s.id === this.state.songId);
+    if (!song || !this.state.playing) return;
+    const flat = this.flat(song);
+    const cur = flat[this.state.idx];
+    if (!cur) { this.setState({ playing: false }); return; }
+    const ms = (60000 / this.state.bpm) * (cur.duration || 1);
+    this.timer = setTimeout(() => {
+      this.setState(s => {
+        const ni = s.idx + 1;
+        return ni >= flat.length ? { idx: flat.length, playing: false } : { idx: ni };
+      });
+    }, ms);
+  }
+
+  componentDidUpdate(pp, ps) {
+    if (this.state.screen === 'song' && this.state.playing &&
+        (!ps.playing || ps.idx !== this.state.idx || ps.bpm !== this.state.bpm)) this.schedule();
+    if (ps.idx !== this.state.idx && this.state.screen === 'song' && this.state.mode === 'auto') {
+      const el = (this.noteEls || {})[this.state.idx], box = this.boxEl;
+      if (el && box) {
+        const t = el.offsetTop - box.clientHeight * 0.35;
+        box.scrollTo({ top: Math.max(0, t), behavior: 'smooth' });
+      }
+    }
+  }
+
+  renderVals() {
+    const bars = this.bars();
+    const all = this.songs();
+    const scale = this.props.blockScale ?? 1;
+    const colorOnly = this.props.colorOnly ?? false;
+    const diffMap = { easy: { t: 'קל', bg: '#e6f0df', fg: '#3E7A48' }, medium: { t: 'בינוני', bg: '#fbeed8', fg: '#a86a1f' } };
+    const langMap = { he: 'עברית', en: 'English', both: 'עברית + English' };
+
+    const vals = {
+      isList: this.state.screen === 'list',
+      isSong: this.state.screen === 'song',
+      songs: all.map(s => {
+        const flat = this.flat(s);
+        return {
+          title: s.title,
+          diff: diffMap[s.difficulty].t, diffBg: diffMap[s.difficulty].bg, diffFg: diffMap[s.difficulty].fg,
+          meta: flat.length + ' צלילים · ' + langMap[s.lyricsLang],
+          preview: flat.slice(0, 8).map(n => bars[n.bar - 1].color),
+          open: () => { this.noteEls = {}; this.setState({ screen: 'song', songId: s.id, idx: 0, mode: 'read' }); }
+        };
+      }),
+      goHome: () => { clearTimeout(this.timer); this.setState({ screen: 'list', playing: false }); },
+      restart: () => this.setState({ idx: 0 }),
+      togglePlay: () => this.togglePlay(),
+      onBpm: (e) => this.setState({ bpm: +e.target.value }),
+      scrollRef: (el) => { this.boxEl = el; }
+    };
+
+    const song = all.find(s => s.id === this.state.songId);
+    if (!song) {
+      vals.refBars = bars.map((b, i) => ({ ...b, h: 34, bigH: 30 + (7 - i) * 5, ring: 'none' }));
+      return vals;
+    }
+
+    const flat = this.flat(song);
+    const total = flat.length;
+    const idx = Math.min(this.state.idx, total);
+    const finished = idx >= total;
+    const cur = flat[Math.min(idx, total - 1)];
+    const curBar = bars[cur.bar - 1];
+    let fi = 0;
+
+    const auto = this.state.mode === 'auto';
+    vals.isAuto = auto;
+    vals.setRead = () => { clearTimeout(this.timer); this.setState({ mode: 'read', playing: false }); };
+    vals.setAuto = () => this.setState({ mode: 'auto', idx: 0 });
+    vals.readTabBg = !auto ? '#2b2620' : 'transparent';
+    vals.readTabFg = !auto ? '#fff' : '#6d6456';
+    vals.autoTabBg = auto ? '#2b2620' : 'transparent';
+    vals.autoTabFg = auto ? '#fff' : '#6d6456';
+    vals.playLabel = this.state.playing ? 'השהה' : (idx > 0 && !finished ? 'המשך' : 'נגן');
+    vals.playBg = this.state.playing ? '#fff' : '#2b2620';
+    vals.playFg = this.state.playing ? '#2b2620' : '#fff';
+    vals.playBorder = this.state.playing ? '1px solid #e0d8c9' : 'none';
+    vals.bpm = this.state.bpm;
+    vals.songTitle = song.title;
+    vals.songMeta = diffMap[song.difficulty].t + ' · ' + total + ' צלילים';
+    vals.songDir = song.lyricsLang === 'en' ? 'ltr' : 'rtl';
+    vals.finished = auto && finished;
+    vals.notFinished = auto && !finished;
+    vals.progress = (idx + 1) + ' מתוך ' + total;
+    vals.curLabel = curBar.label;
+    vals.curBg = curBar.color;
+    vals.curFg = curBar.fg;
+    vals.curSylMain = this.syl(cur).main;
+    vals.curSyl = this.syl(cur).main + (this.syl(cur).sub ? ' · ' + this.syl(cur).sub : '');
+    vals.refBars = bars.map((b, i) => ({
+      ...b,
+      h: 26 + (7 - i) * 2.5,
+      bigH: 30 + (7 - i) * 5,
+      ring: (auto && !finished && cur.bar === i + 1) ? '0 0 0 3px #2b2620' : 'none'
+    }));
+    vals.phrases = song.phrases.map(ph => ({
+      notes: ph.notes.map(n => {
+        const i = fi++;
+        const b = bars[n.bar - 1];
+        const s = this.syl(n);
+        const isCur = auto && !finished && i === idx;
+        const isDone = auto && i < idx;
+        return {
+          w: Math.round((n.duration > 1 ? 98 : 58) * scale),
+          h: Math.round(52 * scale),
+          bg: b.color, fg: b.fg,
+          label: colorOnly ? '' : b.label,
+          syl: s.main, syl2: s.sub, hasSyl2: !!s.sub,
+          sylW: isCur ? 900 : 400,
+          op: isDone ? 0.4 : 1,
+          shadow: isCur ? '0 0 0 3px #fff, 0 0 0 6px #2b2620, 0 10px 22px rgba(0,0,0,.22)' : '0 1px 3px rgba(60,45,20,.18)',
+          tf: isCur ? 'scale(1.1)' : 'none',
+          jump: () => this.setState({ idx: i }),
+          setRef: (el) => { if (!this.noteEls) this.noteEls = {}; this.noteEls[i] = el ? el : this.noteEls[i]; if (el) this.noteEls[i] = el; }
+        };
+      })
+    }));
+    return vals;
+  }
+}
+</script>
+</body>
+</html>
