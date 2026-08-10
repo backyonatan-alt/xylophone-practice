@@ -127,6 +127,56 @@
       { notes: [N(4,'וְ'),N(4,'נִדְ'),N(5,'מֶה'),N(6,'לָהּ'),N(6,'כִּי'),N(5,'רָ'),N(4,'אֲ'),N(3,'תָה'),N(4,'בֵּין'),N(5,'הַפְּ'),N(4,'רָ'),N(3,'חִים',2)] },
       { notes: [N(6,'יַ'),N(6,'קִּינְ'),N(7,'טוֹן'),N(8,'אֶ'),N(7,'חָד'),N(6,'שׁוֹ'),N(5,'נֶה'),N(4,'מִן'),N(5,'הָ'),N(4,'אַ'),N(6,'חִים',2)] }
     ]},
+    // Note: plausible arrangement — verify against how the family sings it.
+    { id: 'eretz', title: 'ארץ ישראל שלי', difficulty: 'easy', lyricsLang: 'he', phrases: [
+      { notes: [N(5,'אֶ'),N(5,'רֶץ'),N(5,'יִשְׂ'),N(4,'רָ'),N(3,'אֵל'),N(4,'שֶׁ'),N(5,'לִּי',2)] },
+      { notes: [N(4,'יָ'),N(4,'פָה'),N(4,'וְ'),N(3,'גַם'),N(2,'פּוֹ'),N(3,'רַ'),N(4,'חַת',2)] },
+      { notes: [N(5,'מִי'),N(5,'בָּ'),N(3,'נָה'),N(5,'וּ'),N(5,'מִי'),N(3,'נָ'),N(3,'טַע',2)] },
+      { notes: [N(4,'כֻּ'),N(4,'לָּ'),N(3,'נוּ'),N(2,'בְּ'),N(2,'יַ'),N(1,'חַד',2)] }
+    ]},
+    // Note: minor-key lullaby squeezed onto the white keys — plausible arrangement,
+    // verify against how the family sings it.
+    { id: 'dugit', title: 'דוגית נוסעת', difficulty: 'medium', lyricsLang: 'he', phrases: [
+      { notes: [N(3,'דּוּ'),N(6,'גִית'),N(6,'נוֹ'),N(7,'סַ'),N(6,'עַת',2)] },
+      { notes: [N(5,'מִפְ'),N(5,'רָ'),N(6,'שֶׂי'),N(5,'הָ'),N(4,'שְׁנַ'),N(3,'יִם',2)] },
+      { notes: [N(3,'וּ'),N(4,'מַ'),N(5,'לָּ'),N(6,'חֶי'),N(5,'הָ'),N(4,'נִרְ'),N(3,'דְּ'),N(2,'מוּ')] },
+      { notes: [N(3,'כֻּ'),N(6,'לָּם',2)] }
+    ]},
+    // Note: minor-key song squeezed onto the white keys — plausible arrangement,
+    // verify against how the family sings it.
+    { id: 'rakefet', title: 'רקפת', difficulty: 'medium', lyricsLang: 'he', phrases: [
+      { notes: [N(6,'מִ'),N(6,'תַּ'),N(7,'חַת'),N(8,'לַ'),N(7,'סֶּ'),N(6,'לַע',2)] },
+      { notes: [N(5,'צוֹ'),N(5,'מַ'),N(6,'חַת'),N(7,'לְ'),N(6,'פֶ'),N(5,'לֶא',2)] },
+      { notes: [N(4,'רַ'),N(4,'קֶּ'),N(5,'פֶת'),N(6,'נֶחְ'),N(5,'מֶ'),N(4,'דֶת'),N(3,'מְ'),N(6,'אֹד',2)] }
+    ]},
+    // Note: minor-key song squeezed onto the white keys — plausible arrangement,
+    // verify against how the family sings it.
+    { id: 'shkedia', title: 'השקדיה פורחת', difficulty: 'medium', lyricsLang: 'he', phrases: [
+      { notes: [N(3,'הַשְּׁ'),N(6,'קֵ'),N(6,'דִ'),N(7,'יָּה'),N(6,'פּוֹ'),N(5,'רַ'),N(6,'חַת',2)] },
+      { notes: [N(3,'וְ'),N(6,'שֶׁ'),N(6,'מֶשׁ'),N(7,'פָּז'),N(6,'זוֹ'),N(5,'רַ'),N(6,'חַת',2)] },
+      { notes: [N(6,'צִ'),N(7,'פֳּ'),N(8,'רִים'),N(7,'מֵ'),N(6,'רֹאשׁ'),N(5,'כָּל'),N(4,'גָּג',2)] },
+      { notes: [N(4,'מְ'),N(5,'בַ'),N(6,'שְּׂ'),N(5,'רוֹת'),N(4,'אֶת'),N(3,'בּוֹא'),N(2,'הֶ'),N(3,'חָג',2)] },
+      { notes: [N(3,'טוּ'),N(4,'בִּשְׁ'),N(5,'בָט'),N(4,'הִ'),N(3,'גִּי'),N(2,'עַ')] },
+      { notes: [N(6,'חַג'),N(5,'הָ'),N(4,'אִי'),N(3,'לָ'),N(6,'נוֹת',2)] }
+    ]},
+    // Note: plausible arrangement — verify against how the family sings it.
+    { id: 'anipurim', title: 'אני פורים', difficulty: 'easy', lyricsLang: 'he', phrases: [
+      { notes: [N(1,'אֲ'),N(3,'נִי'),N(5,'פוּ'),N(5,'רִים',2),N(1,'אֲ'),N(3,'נִי'),N(5,'פוּ'),N(5,'רִים',2)] },
+      { notes: [N(6,'שָׂ'),N(6,'מֵ'),N(5,'חַ'),N(4,'וּמְ'),N(4,'בַ'),N(3,'דֵּ'),N(3,'חַ',2)] },
+      { notes: [N(5,'הֲ'),N(5,'לֹא'),N(4,'רַק'),N(4,'פַּ'),N(3,'עַם'),N(3,'בַּ'),N(2,'שָּׁ'),N(2,'נָה',2)] },
+      { notes: [N(1,'אָ'),N(2,'בוֹא'),N(3,'לְ'),N(4,'הִתְ'),N(2,'אָ'),N(2,'רֵ'),N(1,'חַ',2)] }
+    ]},
+    // Jingle Bells chorus — confident melody fit.
+    { id: 'jingle', title: 'Jingle Bells', difficulty: 'easy', lyricsLang: 'en', phrases: [
+      { notes: [N(3,'Jin'),N(3,'gle'),N(3,'bells',2),N(3,'jin'),N(3,'gle'),N(3,'bells',2)] },
+      { notes: [N(3,'jin'),N(5,'gle'),N(1,'all'),N(2,'the'),N(3,'way',2)] },
+      { notes: [N(4,'Oh'),N(4,'what'),N(4,'fun'),N(4,'it'),N(4,'is'),N(3,'to'),N(3,'ride'),N(3,'in'),N(3,'a')] },
+      { notes: [N(2,'one'),N(2,'horse'),N(3,'o'),N(2,'pen'),N(5,'sleigh',2)] },
+      { notes: [N(3,'Jin'),N(3,'gle'),N(3,'bells',2),N(3,'jin'),N(3,'gle'),N(3,'bells',2)] },
+      { notes: [N(3,'jin'),N(5,'gle'),N(1,'all'),N(2,'the'),N(3,'way',2)] },
+      { notes: [N(4,'Oh'),N(4,'what'),N(4,'fun'),N(4,'it'),N(4,'is'),N(3,'to'),N(3,'ride'),N(3,'in'),N(3,'a')] },
+      { notes: [N(5,'one'),N(5,'horse'),N(4,'o'),N(2,'pen'),N(1,'sleigh',2)] }
+    ]},
     // Old MacDonald adapted for the toy: the melody's low sol/la are played as the
     // higher סול/לה bars (the common toy-xylophone adaptation).
     { id: 'macdonald', title: 'Old MacDonald', difficulty: 'easy', lyricsLang: 'en', phrases: [
