@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Four xylophone bars, descending heights, on a rounded warm tile -->
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="#faf7f1"/>
+  <rect x="56"  y="116" width="88" height="316" rx="28" fill="#D94A45"/>
+  <rect x="168" y="146" width="88" height="286" rx="28" fill="#F3C64B"/>
+  <rect x="280" y="176" width="88" height="256" rx="28" fill="#2E7D3C"/>
+  <rect x="392" y="206" width="88" height="226" rx="28" fill="#3B6FC4"/>
+</svg>

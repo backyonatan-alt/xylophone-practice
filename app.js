@@ -34,6 +34,46 @@
   let noteEls = [];
   let scrollEl = null;
 
+  /* ---------- Routing (History API) ---------- */
+
+  const BASE_TITLE = 'קסילופון בצבעים';
+  const HOME_TITLE = BASE_TITLE + ' — לנגן שירי ילדים בלי תווים';
+
+  const slugFromPath = path => {
+    const m = path.match(/^\/song\/([a-z0-9-]+)\/?$/);
+    return m ? m[1] : null;
+  };
+  const songBySlug = slug => window.SONGS.find(s => s.slug === slug);
+
+  // Carry the display config params (scale/colorOnly/lyrics) across navigations,
+  // and expose mode as a shareable query param (?mode=auto; notes is the default).
+  function buildQuery(mode) {
+    const p = new URLSearchParams();
+    ['scale', 'colorOnly', 'lyrics'].forEach(k => {
+      const v = params.get(k);
+      if (v !== null && v !== '') p.set(k, v);
+    });
+    if (mode === 'auto') p.set('mode', 'auto');
+    const q = p.toString();
+    return q ? '?' + q : '';
+  }
+
+  function navigate(url) {
+    try { history.pushState({ app: true }, '', url); } catch (e) { /* file:// etc. */ }
+  }
+
+  function syncModeInUrl() {
+    if (state.screen !== 'song') return;
+    const song = currentSong();
+    if (!song) return;
+    const mode = state.mode === 'auto' ? 'auto' : 'notes';
+    try {
+      history.replaceState(history.state, '', '/song/' + song.slug + buildQuery(mode));
+    } catch (e) { /* ignore */ }
+  }
+
+  window.track = window.track || function () {}; // app must work if analytics.js is blocked
+
   const app = document.getElementById('app');
   document.documentElement.style.setProperty('--bs', CONFIG.blockScale);
 
@@ -81,6 +121,8 @@
         ${cards}
       </div>`;
 
+    document.title = HOME_TITLE;
+
     app.querySelectorAll('.card').forEach(card => {
       const open = () => openSong(card.dataset.id);
       card.addEventListener('click', open);
@@ -90,13 +132,23 @@
     });
   }
 
+  // User tapped a card — push a history entry so Back returns to the list.
   function openSong(id) {
+    const song = window.SONGS.find(s => s.id === id);
+    if (!song) return;
+    navigate('/song/' + song.slug + buildQuery('notes'));
+    showSong(id, 'read', 'list');
+  }
+
+  function showSong(id, mode, source) {
     clearTimeout(timer);
     state.screen = 'song';
     state.songId = id;
     state.idx = 0;
-    state.mode = 'read';
+    state.mode = mode === 'auto' ? 'auto' : 'read';
     state.playing = false;
+    const song = currentSong();
+    if (song) window.track('song_opened', { song: song.slug, source: source });
     renderSong();
   }
 
@@ -105,6 +157,7 @@
   function renderSong() {
     const song = currentSong();
     if (!song) { renderLibrary(); return; }
+    document.title = song.title + ' — ' + BASE_TITLE;
     const f = flat(song);
     const d = DIFF[song.difficulty];
     const songDir = song.lyricsLang === 'en' ? 'ltr' : 'rtl';
@@ -154,7 +207,7 @@
             </div>
           </div>
           <div class="tempo">
-            <input type="range" dir="ltr" min="30" max="120" step="5" value="${state.bpm}" id="bpmSlider">
+            <input type="range" dir="ltr" min="30" max="120" step="5" value="${state.bpm}" id="bpmSlider" aria-label="קצב הניגון">
             <div class="tempo-caption" id="bpmCaption"></div>
           </div>
         </div>
@@ -174,6 +227,9 @@
     document.getElementById('btnPlay').addEventListener('click', togglePlay);
     document.getElementById('btnAgain').addEventListener('click', togglePlay);
     document.getElementById('bpmSlider').addEventListener('input', onBpm);
+    document.getElementById('bpmSlider').addEventListener('change', () => {
+      window.track('tempo_changed', { song: song.slug, tempo: state.bpm });
+    });
     noteEls.forEach(el => el.addEventListener('click', () => jumpTo(+el.dataset.i)));
 
     update();
@@ -237,6 +293,7 @@
       if (ni >= f.length) {
         state.idx = f.length;
         state.playing = false;
+        window.track('song_completed', { song: song.slug, mode: state.mode === 'auto' ? 'auto' : 'notes' });
         update();
       } else {
         state.idx = ni;
@@ -258,6 +315,7 @@
     } else {
       state.playing = true;
       if (state.idx >= total) state.idx = 0;
+      if (state.mode === 'auto') window.track('play_pressed', { song: song.slug, tempo: state.bpm });
       update();
       autoScroll();
       schedule();
@@ -272,6 +330,8 @@
   }
 
   function restart() {
+    const song = currentSong();
+    if (song) window.track('restart_pressed', { song: song.slug });
     state.idx = 0;
     update();
     autoScroll();
@@ -282,16 +342,27 @@
     clearTimeout(timer);
     state.playing = false;
     state.mode = 'read';
+    const song = currentSong();
+    if (song) window.track('mode_selected', { song: song.slug, mode: 'notes' });
+    syncModeInUrl();
     update();
   }
 
   function setAuto() {
     state.mode = 'auto';
     state.idx = 0;
+    const song = currentSong();
+    if (song) window.track('mode_selected', { song: song.slug, mode: 'auto' });
+    syncModeInUrl();
     update();
   }
 
   function goHome() {
+    navigate('/' + buildQuery('notes'));
+    showList();
+  }
+
+  function showList() {
     clearTimeout(timer);
     state.playing = false;
     state.screen = 'list';
@@ -343,5 +414,35 @@
     if (state.playing) schedule(); // reschedule current timer at new tempo
   }
 
-  renderLibrary();
+  /* ---------- Not found (client-side fallback; the server serves 404.html) ---------- */
+
+  function renderNotFound() {
+    state.screen = 'list';
+    document.title = 'השיר לא נמצא — ' + BASE_TITLE;
+    app.innerHTML = `
+      <div class="lib-header">
+        <h1 class="lib-title">אופס, השיר לא נמצא</h1>
+        <p class="lib-sub">אולי הקישור השתנה — אבל כל השירים מחכים כאן:</p>
+        <p><a href="/" id="nfHome">לרשימת השירים המלאה ←</a></p>
+      </div>`;
+    document.getElementById('nfHome').addEventListener('click', e => {
+      e.preventDefault();
+      goHome();
+    });
+  }
+
+  /* ---------- Boot: derive screen from the URL ---------- */
+
+  function route(isColdLoad) {
+    const slug = slugFromPath(location.pathname);
+    if (!slug) { showList(); return; }
+    const song = songBySlug(slug);
+    if (!song) { renderNotFound(); return; }
+    const mode = new URLSearchParams(location.search).get('mode') === 'auto' ? 'auto' : 'read';
+    showSong(song.id, mode, isColdLoad ? 'direct-link' : 'list');
+  }
+
+  window.addEventListener('popstate', () => route(false));
+
+  route(true);
 })();
