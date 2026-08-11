@@ -243,6 +243,28 @@ button { font-family: inherit; }
   gap: 26px;
 }
 
+.phrase-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.phrase-lyric {
+  font-size: 14px;
+  font-weight: 700;
+  color: #6d6456;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.phrase-lyric-sub {
+  font-size: 12px;
+  font-weight: 400;
+  color: #a09685;
+}
+
 .phrase {
   display: flex;
   flex-wrap: wrap;

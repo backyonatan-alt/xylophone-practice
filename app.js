@@ -88,6 +88,15 @@
     return { main: note.syllable.he, sub: note.syllable.en };
   }
 
+  function lyricOf(phrase) {
+    const L = phrase.lyricLine;
+    if (!L) return null;
+    if (typeof L === 'string') return { main: L, sub: null };
+    if (CONFIG.bilingualDisplay === 'he') return { main: L.he, sub: null };
+    if (CONFIG.bilingualDisplay === 'en') return { main: L.en, sub: null };
+    return { main: L.he, sub: L.en };
+  }
+
   /* ---------- Library screen ---------- */
 
   function renderLibrary() {
@@ -180,7 +189,11 @@
           ${s.sub ? `<div class="syl2" dir="ltr">${esc(s.sub)}</div>` : ''}
         </div>`;
       }).join('');
-      return `<div class="phrase" dir="${songDir}">${notes}</div>`;
+      const lyr = lyricOf(ph);
+      const heading = lyr
+        ? `<div class="phrase-lyric" dir="${songDir}">${esc(lyr.main)}${lyr.sub ? `<span class="phrase-lyric-sub" dir="ltr">${esc(lyr.sub)}</span>` : ''}</div>`
+        : '';
+      return `<div class="phrase-block">${heading}<div class="phrase" dir="${songDir}">${notes}</div></div>`;
     }).join('');
 
     app.innerHTML = `
