@@ -211,9 +211,13 @@
         <button id="tabRead">תווים</button>
         <button id="tabAuto">ניגון אוטומטי</button>
       </div>
-      <div class="guide-note noprint">הנגינה על הקסילופון האמיתי — המסך רק מראה מה לנגן</div>
-      <div class="refstrip" dir="ltr">${refBars}</div>
-      <div class="notation" id="notation">${phrases}</div>
+      <div class="notation" id="notation">
+        <div class="seq-head">
+          <div class="guide-note noprint">הנגינה על הקסילופון האמיתי — המסך רק מראה מה לנגן</div>
+          <div class="refstrip" dir="ltr">${refBars}</div>
+        </div>
+        ${phrases}
+      </div>
       <div class="bottombar noprint hidden" id="bottombar">
         <div class="bb-row" id="bbPlay">
           <button class="btn-play" id="btnPlay">נגן</button>
