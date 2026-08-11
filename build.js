@@ -29,7 +29,7 @@ const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 // 10 min; without this, a fresh HTML page can load a stale cached app.js/analytics.js.
 const V = (() => {
   const h = require('crypto').createHash('sha1');
-  for (const f of ['app.js', 'analytics.js', 'songs.js', 'styles.css']) {
+  for (const f of ['app.js', 'analytics.js', 'audio.js', 'songs.js', 'styles.css']) {
     h.update(fs.readFileSync(path.join(ROOT, f)));
   }
   return h.digest('hex').slice(0, 10);
@@ -78,6 +78,7 @@ function page({ title, desc, ogTitle, ogImage, url, bodyExtra }) {
 <div class="app" id="app" dir="rtl"></div>
 ${bodyExtra || ''}<script src="/songs.js?v=${V}"></script>
 <script src="/analytics.js?v=${V}"></script>
+<script src="/audio.js?v=${V}"></script>
 <script src="/app.js?v=${V}"></script>
 </body>
 </html>

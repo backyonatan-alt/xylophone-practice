@@ -115,7 +115,7 @@
       <div class="lib-header">
         <div class="mini-xylo" dir="ltr">${miniBars}</div>
         <h1 class="lib-title">קסילופון בצבעים</h1>
-        <p class="lib-sub">מדריך נגינה חזותי לשירי ילדים · בלי תווים, רק צבעים</p>
+        <p class="lib-sub">מדריך נגינה חזותי לקסילופון אמיתי · בלי תווים, רק צבעים</p>
       </div>
       <div class="lib-list">
         ${cards}
@@ -162,8 +162,10 @@
     const d = DIFF[song.difficulty];
     const songDir = song.lyricsLang === 'en' ? 'ltr' : 'rtl';
 
+    // The legend: tapping a bar previews its note once so a parent can match
+    // colors/sounds to the real toy. It is not an instrument.
     const refBars = BARS.map((b, i) =>
-      `<div class="ref-bar" data-bar="${i + 1}" style="height:${26 + (7 - i) * 2.5}px;background:${b.color};color:${b.fg}">${b.label}</div>`
+      `<div class="ref-bar" role="button" tabindex="0" aria-label="${b.full}" data-bar="${i + 1}" style="height:${26 + (7 - i) * 2.5}px;background:${b.color};color:${b.fg}">${b.label}</div>`
     ).join('');
 
     let fi = 0;
@@ -189,11 +191,13 @@
           <div class="song-meta">${d.t} · ${f.length} צלילים</div>
         </div>
         <button class="btn-restart" id="btnRestart">מהתחלה</button>
+        <button class="btn-full" id="btnFull" aria-label="מסך מלא">⛶</button>
       </div>
       <div class="toggle noprint">
         <button id="tabRead">תווים</button>
         <button id="tabAuto">ניגון אוטומטי</button>
       </div>
+      <div class="guide-note noprint">הנגינה על הקסילופון האמיתי — המסך רק מראה מה לנגן</div>
       <div class="refstrip" dir="ltr">${refBars}</div>
       <div class="notation" id="notation">${phrases}</div>
       <div class="bottombar noprint hidden" id="bottombar">
@@ -231,6 +235,29 @@
       window.track('tempo_changed', { song: song.slug, tempo: state.bpm });
     });
     noteEls.forEach(el => el.addEventListener('click', () => jumpTo(+el.dataset.i)));
+
+    app.querySelectorAll('.ref-bar').forEach(el => {
+      const preview = () => window.XyloAudio && window.XyloAudio.preview(+el.dataset.bar - 1);
+      el.addEventListener('click', preview);
+      el.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); preview(); }
+      });
+    });
+
+    const btnFull = document.getElementById('btnFull');
+    if (!document.documentElement.requestFullscreen) {
+      btnFull.classList.add('hidden'); // iPhone Safari has no Fullscreen API
+    } else {
+      btnFull.addEventListener('click', () => {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        } else {
+          document.documentElement.requestFullscreen().then(() => {
+            window.track('fullscreen_entered', { song: song.slug });
+          }).catch(() => { /* denied — ignore */ });
+        }
+      });
+    }
 
     update();
   }
@@ -280,6 +307,12 @@
 
   /* ---------- Playback ---------- */
 
+  // Auto-play is audible so a parent can hear the melody before guiding the child.
+  function soundCurrent(song) {
+    const cur = flat(song)[state.idx];
+    if (cur && window.XyloAudio) window.XyloAudio.note(cur.bar - 1);
+  }
+
   function schedule() {
     clearTimeout(timer);
     const song = currentSong();
@@ -297,6 +330,7 @@
         update();
       } else {
         state.idx = ni;
+        soundCurrent(song);
         update();
         autoScroll();
         schedule();
@@ -316,6 +350,7 @@
       state.playing = true;
       if (state.idx >= total) state.idx = 0;
       if (state.mode === 'auto') window.track('play_pressed', { song: song.slug, tempo: state.bpm });
+      soundCurrent(song);
       update();
       autoScroll();
       schedule();
@@ -324,9 +359,9 @@
 
   function jumpTo(i) {
     state.idx = i;
+    if (state.playing) { soundCurrent(currentSong()); schedule(); }
     update();
     autoScroll();
-    if (state.playing) schedule();
   }
 
   function restart() {
@@ -443,6 +478,10 @@
   }
 
   window.addEventListener('popstate', () => route(false));
+
+  // Kid-proofing: block iOS pinch zoom inside the app (double-tap zoom is
+  // handled by touch-action in CSS).
+  document.addEventListener('gesturestart', e => e.preventDefault());
 
   route(true);
 })();
