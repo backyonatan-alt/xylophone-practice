@@ -4,9 +4,10 @@
   'use strict';
 
   // The physical instrument — bar index 1–8, low → high.
+  // Colors pass WCAG AA (4.5:1) for the label text — measured, not eyeballed.
   const BARS = [
-    { label: 'דו',  full: 'דו נמוך', color: '#D94A45', fg: '#fff' },
-    { label: 'רה',  full: 'רה',      color: '#EF8A3C', fg: '#fff' },
+    { label: 'דו',  full: 'דו נמוך', color: '#C13732', fg: '#fff' },
+    { label: 'רה',  full: 'רה',      color: '#EF8A3C', fg: '#4a2500' },
     { label: 'מי',  full: 'מי',      color: '#F3C64B', fg: '#6b4e00' },
     { label: 'פה',  full: 'פה',      color: '#AED262', fg: '#3d5012' },
     { label: 'סול', full: 'סול',     color: '#2E7D3C', fg: '#fff' },
@@ -199,7 +200,7 @@
     app.innerHTML = `
       <div class="topbar noprint">
         <button class="btn-back" id="btnBack" aria-label="חזרה לרשימת השירים">→</button>
-        <div class="topbar-info">
+        <div class="topbar-info" id="topbarInfo" role="button" tabindex="0" aria-label="חזרה לרשימת השירים">
           <div class="song-title">${esc(song.title)}</div>
           <div class="song-meta">${d.t} · ${f.length} צלילים</div>
         </div>
@@ -238,6 +239,11 @@
     noteEls = Array.from(app.querySelectorAll('.note'));
 
     document.getElementById('btnBack').addEventListener('click', goHome);
+    const info = document.getElementById('topbarInfo');
+    info.addEventListener('click', goHome);
+    info.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goHome(); }
+    });
     document.getElementById('btnRestart').addEventListener('click', restart);
     document.getElementById('tabRead').addEventListener('click', setRead);
     document.getElementById('tabAuto').addEventListener('click', setAuto);
@@ -288,6 +294,8 @@
 
     document.getElementById('tabRead').classList.toggle('active', !auto);
     document.getElementById('tabAuto').classList.toggle('active', auto);
+    document.getElementById('tabRead').setAttribute('aria-pressed', String(!auto));
+    document.getElementById('tabAuto').setAttribute('aria-pressed', String(auto));
     document.getElementById('btnRestart').classList.toggle('hidden', !auto);
 
     noteEls.forEach((el, i) => {
@@ -316,6 +324,7 @@
     document.getElementById('curSyl').textContent = s.main + (s.sub ? ' · ' + s.sub : '');
     document.getElementById('progress').textContent = (Math.min(idx, total - 1) + 1) + ' מתוך ' + total;
     document.getElementById('bpmCaption').textContent = 'קצב: ' + state.bpm + ' לדקה';
+    document.getElementById('bpmSlider').setAttribute('aria-valuetext', state.bpm + ' לדקה');
   }
 
   /* ---------- Playback ---------- */
@@ -495,6 +504,14 @@
   // Kid-proofing: block iOS pinch zoom inside the app (double-tap zoom is
   // handled by touch-action in CSS).
   document.addEventListener('gesturestart', e => e.preventDefault());
+
+  // PWA: offline shell + install tracking.
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(() => { /* e.g. file:// */ });
+    });
+  }
+  window.addEventListener('appinstalled', () => window.track('pwa_installed'));
 
   route(true);
 })();
