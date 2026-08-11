@@ -25,6 +25,16 @@ const BAR_FG = ['#fff', '#fff', '#6b4e00', '#3d5012', '#fff', '#123a52', '#fff',
 
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 
+// Cache-buster appended to same-origin asset URLs. GitHub Pages caches files for
+// 10 min; without this, a fresh HTML page can load a stale cached app.js/analytics.js.
+const V = (() => {
+  const h = require('crypto').createHash('sha1');
+  for (const f of ['app.js', 'analytics.js', 'songs.js', 'styles.css']) {
+    h.update(fs.readFileSync(path.join(ROOT, f)));
+  }
+  return h.digest('hex').slice(0, 10);
+})();
+
 function loadSongs() {
   const sandbox = { window: {} };
   vm.runInNewContext(fs.readFileSync(path.join(ROOT, 'songs.js'), 'utf8'), sandbox);
@@ -61,14 +71,14 @@ function page({ title, desc, ogTitle, ogImage, url, bodyExtra }) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/styles.css?v=${V}">
 <script defer src="https://cloud.umami.is/script.js" data-website-id="f05879d7-dfee-4c75-a791-f31bd9cb8741" data-domains="ksilofon.com"></script>
 </head>
 <body>
 <div class="app" id="app" dir="rtl"></div>
-${bodyExtra || ''}<script src="/songs.js"></script>
-<script src="/analytics.js"></script>
-<script src="/app.js"></script>
+${bodyExtra || ''}<script src="/songs.js?v=${V}"></script>
+<script src="/analytics.js?v=${V}"></script>
+<script src="/app.js?v=${V}"></script>
 </body>
 </html>
 `;
