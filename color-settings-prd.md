@@ -75,6 +75,7 @@ One new **settings screen** ("התאמת צבעים") reachable from the library
   | שחור | `#3A342E` | `#fff` |
   | עץ | `#C89A63` | `#40280a` |
 
+- **Preset colors stay reachable:** when the active palette contains colors outside the 12 base swatches (e.g., the pastel preset), those colors appear as additional swatches in the sheet — so a parent who tweaks one bar after choosing a preset can always pick the preset's colors back. Every preset color therefore also needs a pre-measured `fg`.
 - **Duplicate warning:** if two or more bars share a color, show a non-blocking warning ("שני צלילים באותו צבע — קשה להבחין ביניהם") — allowed but discouraged (some real toys do repeat colors).
 - White swatch renders with a visible border everywhere (blocks, strips, previews).
 
@@ -84,7 +85,7 @@ The chosen palette drives every colored element currently fed by the `BARS` arra
 ### FR6 — Confirm, persist, reset
 - Explicit confirm ("שמירה") applies + persists; leaving without confirm discards.
 - Persistence: `localStorage` (survives sessions, per device). URL param (e.g., `?colors=<preset-id>` or compact custom encoding) overrides localStorage for that visit — keeps links shareable and consistent with the existing `?scale/colorOnly/lyrics` config-param pattern.
-- "חזרה לצבעים המקוריים" reset action, always visible in settings.
+- "חזרה לצבעים המקוריים" reset action, always visible on the settings screen (the temporary swatch sheet may cover it while open).
 
 ### FR7 — Analytics
 - Events (cookieless, no user data, consistent with existing policy): settings opened, preset chosen (preset id), custom saved (no color values needed — or values only as anonymous palette string), flip used, reset used.

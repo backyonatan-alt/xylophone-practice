@@ -7,7 +7,7 @@
   ],
   "annotations": [
     { "id": "entry-note", "x": 0, "y": -170, "w": 340, "text": "Entry point (PRD open Q1): shown as a quiet link-card after the song list. Alternative: a gear icon in the header — kept off to avoid competing with song cards / kid taps." },
-    { "id": "presets-note", "x": 490, "y": -170, "w": 360, "text": "Flip, presets and manual on one screen (PRD Q2: flip as a row above presets). Metal + pastel preset palettes are placeholders — verify against best-selling toys before build.\nHappy path = tap a preset, tap save: 2 taps." },
+    { "id": "presets-note", "x": 490, "y": -170, "w": 360, "text": "Flip, presets and manual on one screen (PRD Q2: flip as a row above presets; the whole row is the tap target). Metal + pastel preset palettes are placeholders — verify against best-selling toys before build.\nManual bars are ~36px wide on a 390 frame — same as the app's shipped reference strip; their 54–82px height keeps the tap area comfortable.\nHappy path = tap a preset, tap save: 2 taps." },
     { "id": "sheet-note", "x": 980, "y": -170, "w": 340, "text": "Swatch picker as a bottom sheet (PRD Q3) — bigger targets for one-handed use than a popover. 12 fixed swatches, each with a pre-measured label color; no free color wheel." },
     { "id": "warning-note", "x": 1470, "y": -170, "w": 340, "text": "Duplicate colors: non-blocking warning (existing amber chip tokens), save stays enabled — some real toys do repeat colors. The two matching bars get an amber ring." }
   ],
