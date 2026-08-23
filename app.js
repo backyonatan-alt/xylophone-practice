@@ -3,18 +3,99 @@
 (function () {
   'use strict';
 
-  // The physical instrument — bar index 1–8, low → high.
-  // Colors pass WCAG AA (4.5:1) for the label text — measured, not eyeballed.
-  const BARS = [
-    { label: 'דו',  full: 'דו נמוך', color: '#C13732', fg: '#fff' },
-    { label: 'רה',  full: 'רה',      color: '#EF8A3C', fg: '#4a2500' },
-    { label: 'מי',  full: 'מי',      color: '#F3C64B', fg: '#6b4e00' },
-    { label: 'פה',  full: 'פה',      color: '#AED262', fg: '#3d5012' },
-    { label: 'סול', full: 'סול',     color: '#2E7D3C', fg: '#fff' },
-    { label: 'לה',  full: 'לה',      color: '#82CBEC', fg: '#123a52' },
-    { label: 'סי',  full: 'סי',      color: '#2C4A8F', fg: '#fff' },
-    { label: 'דו׳', full: 'דו גבוה', color: '#8B5FB0', fg: '#fff' } // U+05F3 geresh, not ascii apostrophe
+  // The physical instrument — bar index 1–8, low → high. Labels are fixed;
+  // colors are a palette the parent can match to their own toy (see Colors below).
+  const BAR_META = [
+    { label: 'דו',  full: 'דו נמוך' },
+    { label: 'רה',  full: 'רה' },
+    { label: 'מי',  full: 'מי' },
+    { label: 'פה',  full: 'פה' },
+    { label: 'סול', full: 'סול' },
+    { label: 'לה',  full: 'לה' },
+    { label: 'סי',  full: 'סי' },
+    { label: 'דו׳', full: 'דו גבוה' } // U+05F3 geresh, not ascii apostrophe
   ];
+
+  /* ---------- Colors: palettes, presets, swatches ---------- */
+
+  // Every color the UI can assign to a bar has a measured WCAG-AA (4.5:1)
+  // label color. If you add a color anywhere here, measure its fg too.
+  const COLOR_FG = {
+    '#C13732': '#fff',    '#EF8A3C': '#4a2500', '#F3C64B': '#6b4e00', '#AED262': '#3d5012',
+    '#2E7D3C': '#fff',    '#82CBEC': '#123a52', '#2C4A8F': '#fff',    '#8B5FB0': '#fff',
+    '#F06BA8': '#5c1030', '#F5F2EC': '#2b2620', '#3A342E': '#fff',    '#C89A63': '#40280a',
+    '#E58C8A': '#4d1615', '#F2B279': '#4a2500', '#F5D98B': '#5c4a00', '#BFD9A0': '#324618',
+    '#8FC9B8': '#123a2e', '#9FC4E8': '#12304f', '#8E9FD4': '#131f45', '#C4A3D4': '#301b40'
+  };
+  const COLOR_NAME = {
+    '#C13732': 'אדום',      '#EF8A3C': 'כתום',       '#F3C64B': 'צהוב',       '#AED262': 'ירוק בהיר',
+    '#2E7D3C': 'ירוק כהה',  '#82CBEC': 'תכלת',       '#2C4A8F': 'כחול',       '#8B5FB0': 'סגול',
+    '#F06BA8': 'ורוד',      '#F5F2EC': 'לבן',        '#3A342E': 'שחור',       '#C89A63': 'עץ',
+    '#E58C8A': 'ורוד פסטל', '#F2B279': 'אפרסק',      '#F5D98B': 'חמאה',       '#BFD9A0': 'ירוק פסטל',
+    '#8FC9B8': 'מנטה',      '#9FC4E8': 'תכלת פסטל',  '#8E9FD4': 'כחול פסטל',  '#C4A3D4': 'לילך'
+  };
+  const DEFAULT_COLORS = ['#C13732', '#EF8A3C', '#F3C64B', '#AED262', '#2E7D3C', '#82CBEC', '#2C4A8F', '#8B5FB0'];
+  // The 12 base swatches offered in the manual picker (active-palette colors are appended).
+  const SWATCHES = ['#C13732', '#EF8A3C', '#F3C64B', '#AED262', '#2E7D3C', '#82CBEC', '#2C4A8F', '#8B5FB0',
+                    '#F06BA8', '#F5F2EC', '#3A342E', '#C89A63'];
+  const PRESETS = [
+    { id: 'classic',  name: 'קשת — קלאסי', colors: DEFAULT_COLORS },
+    { id: 'reversed', name: 'קשת הפוכה',   colors: DEFAULT_COLORS.slice().reverse() },
+    { id: 'metal',    name: 'מתכת',        colors: ['#C13732', '#EF8A3C', '#F3C64B', '#2E7D3C', '#82CBEC', '#2C4A8F', '#F06BA8', '#F5F2EC'] },
+    { id: 'pastel',   name: 'פסטל מעץ',    colors: ['#E58C8A', '#F2B279', '#F5D98B', '#BFD9A0', '#8FC9B8', '#9FC4E8', '#8E9FD4', '#C4A3D4'] }
+  ];
+
+  const luminance = hex => {
+    const c = hex.slice(1);
+    const [r, g, b] = [0, 2, 4].map(i => parseInt(c.slice(i, i + 2), 16) / 255)
+      .map(v => v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4));
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const contrast = (a, b) => {
+    const [l1, l2] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+    return (l1 + 0.05) / (l2 + 0.05);
+  };
+  // Unknown hex (legacy stored value): pick whichever of white/ink reads better.
+  const fgFor = hex => COLOR_FG[hex] ||
+    (contrast(hex, '#ffffff') >= contrast(hex, '#2b2620') ? '#fff' : '#2b2620');
+  const isLightColor = hex => luminance(hex) > 0.75; // near-white bars need a border
+
+  // BARS is the single source of truth the whole app renders from.
+  const BARS = [];
+  function applyPalette(colors) {
+    BAR_META.forEach((m, i) => {
+      BARS[i] = { label: m.label, full: m.full, color: colors[i], fg: fgFor(colors[i]) };
+    });
+  }
+
+  const isHex = s => typeof s === 'string' && /^#[0-9a-fA-F]{6}$/.test(s);
+  const COLOR_KEY = 'xyloColors';
+  function loadStoredColors() {
+    try {
+      const d = JSON.parse(localStorage.getItem(COLOR_KEY));
+      if (d && Array.isArray(d.colors) && d.colors.length === 8 && d.colors.every(isHex)) return d.colors;
+    } catch (e) { /* corrupt/blocked storage — fall back to default */ }
+    return null;
+  }
+  function saveStoredColors(colors) {
+    try { localStorage.setItem(COLOR_KEY, JSON.stringify({ v: 1, colors: colors })); } catch (e) { /* ignore */ }
+  }
+  const presetIdFor = colors => {
+    const p = PRESETS.find(p => p.colors.every((c, i) => c === colors[i]));
+    return p ? p.id : null;
+  };
+  // ?colors= accepts a preset id, or x-RRGGBB-…-RRGGBB (8 colors). URL wins for
+  // the visit but is never persisted — a shared link must not overwrite a setup.
+  function colorsFromParam(v) {
+    if (!v) return null;
+    const p = PRESETS.find(p => p.id === v);
+    if (p) return p.colors;
+    if (v.slice(0, 2) === 'x-') {
+      const cs = v.slice(2).split('-').map(h => '#' + h);
+      if (cs.length === 8 && cs.every(isHex)) return cs;
+    }
+    return null;
+  }
 
   const DIFF = {
     easy:   { t: 'קל',     bg: '#e6f0df', fg: '#3E7A48' },
@@ -22,13 +103,19 @@
   };
   const LANG = { he: 'עברית', en: 'English', both: 'עברית + English' };
 
-  // Configurable options (settable via URL params: ?scale=1.2&colorOnly=1&lyrics=he)
+  // Configurable options (settable via URL params: ?scale=1.2&colorOnly=1&lyrics=he&colors=reversed)
   const params = new URLSearchParams(location.search);
   const CONFIG = {
     blockScale: Math.min(1.5, Math.max(0.75, parseFloat(params.get('scale')) || 1)),
     colorOnly: params.get('colorOnly') === '1' || params.get('colorOnly') === 'true',
     bilingualDisplay: ['both', 'he', 'en'].includes(params.get('lyrics')) ? params.get('lyrics') : 'both'
   };
+
+  // Resolve the palette: URL param (for this visit) → saved setup → default.
+  const urlColors = colorsFromParam(params.get('colors'));
+  applyPalette(urlColors || loadStoredColors() || DEFAULT_COLORS);
+  // First-visit setup is done once a palette was saved; a ?colors link also skips it.
+  const setupDone = () => !!urlColors || !!loadStoredColors();
 
   const state = { screen: 'list', songId: null, mode: 'read', idx: 0, playing: false, bpm: 60 };
   let timer = null;
@@ -50,7 +137,7 @@
   // and expose mode as a shareable query param (?mode=auto; notes is the default).
   function buildQuery(mode) {
     const p = new URLSearchParams();
-    ['scale', 'colorOnly', 'lyrics'].forEach(k => {
+    ['scale', 'colorOnly', 'lyrics', 'colors'].forEach(k => {
       const v = params.get(k);
       if (v !== null && v !== '') p.set(k, v);
     });
@@ -124,7 +211,10 @@
     app.innerHTML = `
       <div class="lib-header">
         <div class="mini-xylo" dir="ltr">${miniBars}</div>
-        <h1 class="lib-title">קסילופון בצבעים</h1>
+        <div class="lib-title-row">
+          <h1 class="lib-title">קסילופון בצבעים</h1>
+          <button class="btn-icon" id="btnColors" aria-label="התאמת צבעים">${SLIDERS_SVG}</button>
+        </div>
         <p class="lib-sub">מדריך נגינה חזותי לקסילופון אמיתי · בלי תווים, רק צבעים</p>
       </div>
       <div class="lib-list">
@@ -133,12 +223,235 @@
 
     document.title = HOME_TITLE;
 
+    document.getElementById('btnColors').addEventListener('click', openSettings);
+
     app.querySelectorAll('.card').forEach(card => {
       const open = () => openSong(card.dataset.id);
       card.addEventListener('click', open);
       card.addEventListener('keydown', e => {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
       });
+    });
+  }
+
+  /* ---------- Color setup & settings screens ---------- */
+
+  const SLIDERS_SVG = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>';
+
+  // A flexible-width xylophone row: 8 bars, low→high LTR, descending heights.
+  function xyloBars(colors, base, step, withLabels, cls) {
+    return colors.map((c, i) => {
+      const light = isLightColor(c) ? ' light' : '';
+      return `<div class="bar${light}${cls ? ' ' + cls : ''}" data-bar="${i + 1}" style="height:${base + (7 - i) * step}px;background:${c};color:${fgFor(c)}">${withLabels ? BAR_META[i].label : ''}</div>`;
+    }).join('');
+  }
+
+  // First visit: the parent states their instrument once, then it sticks.
+  function renderSetup() {
+    document.title = HOME_TITLE;
+    app.innerHTML = `
+      <div class="setup">
+        <div class="setup-head">
+          <div class="setup-title">רגע לפני שמתחילים</div>
+          <div class="setup-sub">האם הקסילופון שלכם נראה כך?</div>
+        </div>
+        <div class="panel">
+          <div class="xylo" dir="ltr">${xyloBars(DEFAULT_COLORS, 66, 6, true)}</div>
+        </div>
+        <div class="setup-actions">
+          <button class="btn-primary" id="setupYes">כן, זה שלנו</button>
+          <button class="btn-secondary" id="setupNo">לא — נתאים את הצבעים</button>
+          <div class="setup-note">אפשר לשנות בכל רגע מתוך מסך השירים</div>
+        </div>
+      </div>`;
+    document.getElementById('setupYes').addEventListener('click', () => {
+      saveStoredColors(DEFAULT_COLORS);
+      applyPalette(DEFAULT_COLORS);
+      window.track('setup_choice', { choice: 'default' });
+      renderLibrary();
+    });
+    document.getElementById('setupNo').addEventListener('click', () => {
+      window.track('setup_choice', { choice: 'customize' });
+      openSettings();
+    });
+  }
+
+  // Settings edit state — local until שמירה; leaving discards.
+  let edit = null;
+
+  function openSettings() {
+    navigate(location.pathname + location.search); // extra entry so browser-Back leaves settings
+    clearTimeout(timer);
+    state.playing = false;
+    state.screen = 'settings';
+    edit = { colors: BARS.map(b => b.color), sheetBar: null, flipped: false };
+    window.track('colors_opened');
+    renderSettings();
+  }
+
+  const dupIndices = colors => colors.map((c, i) => colors.indexOf(c) !== i || colors.lastIndexOf(c) !== i ? i : -1).filter(i => i >= 0);
+
+  function renderSettings() {
+    const presetCards = PRESETS.map(p => {
+      const active = p.colors.every((c, i) => c === edit.colors[i]);
+      const bars = p.colors.map((c, i) =>
+        `<div class="pbar${isLightColor(c) ? ' light' : ''}" style="height:${21 + (7 - i) * 3}px;background:${c}"></div>`
+      ).join('');
+      return `<div class="preset${active ? ' active' : ''}" role="button" tabindex="0" data-preset="${p.id}" aria-pressed="${active}">
+        <div class="preset-check" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg></div>
+        <div class="preset-bars" dir="ltr">${bars}</div>
+        <div class="preset-name">${p.name}</div>
+      </div>`;
+    }).join('');
+
+    // Snippet: opening of יונתן הקטן (bars 5,3,3) in the edited palette.
+    const snippet = [[5, 'יוֹ'], [3, 'נָ'], [3, 'תָן']].map(([bar, s]) => {
+      const c = edit.colors[bar - 1];
+      return `<div class="snip">
+        <div class="snip-block${isLightColor(c) ? ' light' : ''}" style="background:${c};color:${fgFor(c)}">${BAR_META[bar - 1].label}</div>
+        <div class="snip-syl">${s}</div>
+      </div>`;
+    }).join('');
+
+    const dups = dupIndices(edit.colors);
+    const barCls = i => (dups.includes(i) ? 'dup' : '') + (edit.sheetBar === i ? ' sel' : '');
+    const editBars = edit.colors.map((c, i) =>
+      `<div class="bar edit ${barCls(i)}${isLightColor(c) ? ' light' : ''}" role="button" tabindex="0" data-bar="${i + 1}" aria-label="צליל ${BAR_META[i].full} — צבע ${COLOR_NAME[c] || c}" style="height:${54 + (7 - i) * 4}px;background:${c};color:${fgFor(c)}">${BAR_META[i].label}</div>`
+    ).join('');
+
+    // Sheet: 12 base swatches + any active-palette colors outside them (presets stay reachable).
+    const sheetColors = SWATCHES.concat(edit.colors.filter(c => SWATCHES.indexOf(c) < 0)
+      .filter((c, i, a) => a.indexOf(c) === i));
+    const curColor = edit.sheetBar !== null ? edit.colors[edit.sheetBar] : null;
+    const swatches = sheetColors.map(c =>
+      `<div class="swatch-wrap"><div class="swatch${c === curColor ? ' on' : ''}${isLightColor(c) ? ' light' : ''}" role="button" tabindex="0" data-color="${c}" aria-label="${COLOR_NAME[c] || c}" style="background:${c}"></div><div class="swatch-name">${COLOR_NAME[c] || ''}</div></div>`
+    ).join('');
+    const sheetOpen = edit.sheetBar !== null;
+    const sheetTitleChip = sheetOpen
+      ? `<div class="sheet-chip" style="background:${curColor};color:${fgFor(curColor)}">${BAR_META[edit.sheetBar].label}</div>` : '';
+    const ORDINALS = ['הראשון', 'השני', 'השלישי', 'הרביעי', 'החמישי', 'השישי', 'השביעי', 'השמיני'];
+
+    app.innerHTML = `
+      <div class="topbar">
+        <button class="btn-back" id="btnBack" aria-label="חזרה בלי לשמור">→</button>
+        <div class="topbar-info">
+          <div class="song-title">התאמת צבעים</div>
+          <div class="song-meta">מתאים לקסילופון עם 8 צלילים</div>
+        </div>
+      </div>
+      <div class="settings" id="settingsScroll">
+        <div class="panel preview-panel">
+          <div class="panel-label">כך ייראה הקסילופון באפליקציה</div>
+          <div class="xylo" dir="ltr">${xyloBars(edit.colors, 61, 5, true)}</div>
+          <div class="snip-row"><div class="snip-caption">וכך בשיר:</div><div class="snips" dir="rtl">${snippet}</div></div>
+        </div>
+        <div class="panel flip-row" id="flipRow" role="switch" tabindex="0" aria-checked="${edit.flipped}" aria-label="להפוך את הכיוון">
+          <div>
+            <div class="row-title">להפוך את הכיוון</div>
+            <div class="row-sub">האדום אצלכם בצד של הצלילים הגבוהים?</div>
+          </div>
+          <div class="switch${edit.flipped ? ' on' : ''}"><div class="knob"></div></div>
+        </div>
+        <div>
+          <div class="sect-title">איזה קסילופון יש לכם?</div>
+          <div class="sect-sub">בחרו את זה שנראה כמו שלכם</div>
+        </div>
+        <div class="preset-grid">${presetCards}</div>
+        <div class="panel">
+          <div class="row-title">התאמה ידנית</div>
+          <div class="row-sub">מתחילים מהצבעים שבחרתם — הקישו על צליל כדי לשנות רק אותו</div>
+          <div class="xylo edit-xylo" dir="ltr">${editBars}</div>
+        </div>
+        <div class="warn${dups.length ? '' : ' hidden'}" role="alert">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          <div>
+            <div class="warn-title">שני צלילים באותו צבע — יהיה קשה להבחין ביניהם</div>
+            <div class="warn-sub">אם זה באמת הקסילופון שלכם, אפשר לשמור בכל זאת.</div>
+          </div>
+        </div>
+      </div>
+      <div class="savebar">
+        <button class="btn-primary" id="btnSave">שמירת הצבעים</button>
+        <button class="link-reset" id="btnReset">חזרה לצבעים המקוריים</button>
+      </div>
+      <div class="scrim${sheetOpen ? '' : ' hidden'}" id="scrim"></div>
+      <div class="sheet${sheetOpen ? '' : ' hidden'}" id="sheet" role="dialog" aria-label="בחירת צבע">
+        <div class="sheet-handle"></div>
+        <div class="sheet-head">
+          ${sheetTitleChip}
+          <div>
+            <div class="row-title">איזה צבע לצליל הזה?</div>
+            <div class="row-sub">${sheetOpen ? 'הצליל ' + ORDINALS[edit.sheetBar] + ' משמאל בקסילופון שלכם' : ''}</div>
+          </div>
+        </div>
+        <div class="swatch-grid">${swatches}</div>
+      </div>`;
+
+    document.title = 'התאמת צבעים — ' + BASE_TITLE;
+
+    const rerender = () => {
+      const sc = document.getElementById('settingsScroll');
+      const st = sc ? sc.scrollTop : 0;
+      renderSettings();
+      const sc2 = document.getElementById('settingsScroll');
+      if (sc2) sc2.scrollTop = st;
+    };
+
+    document.getElementById('btnBack').addEventListener('click', goHome);
+    const flip = () => {
+      edit.colors.reverse();
+      edit.flipped = !edit.flipped;
+      window.track('colors_flipped');
+      rerender();
+    };
+    const flipRow = document.getElementById('flipRow');
+    flipRow.addEventListener('click', flip);
+    flipRow.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flip(); }
+    });
+    app.querySelectorAll('.preset').forEach(el => {
+      const pick = () => {
+        const p = PRESETS.find(p => p.id === el.dataset.preset);
+        edit.colors = p.colors.slice();
+        edit.flipped = false;
+        rerender();
+      };
+      el.addEventListener('click', pick);
+      el.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); }
+      });
+    });
+    app.querySelectorAll('.bar.edit').forEach(el => {
+      const open = () => { edit.sheetBar = +el.dataset.bar - 1; rerender(); };
+      el.addEventListener('click', open);
+      el.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+      });
+    });
+    const closeSheet = () => { edit.sheetBar = null; rerender(); };
+    document.getElementById('scrim').addEventListener('click', closeSheet);
+    app.querySelectorAll('.swatch').forEach(el => {
+      const pick = () => {
+        if (edit.sheetBar !== null) edit.colors[edit.sheetBar] = el.dataset.color;
+        closeSheet();
+      };
+      el.addEventListener('click', pick);
+      el.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); }
+      });
+    });
+    document.getElementById('btnSave').addEventListener('click', () => {
+      saveStoredColors(edit.colors);
+      applyPalette(edit.colors);
+      window.track('colors_saved', { palette: presetIdFor(edit.colors) || 'custom', flipped: edit.flipped });
+      goHome();
+    });
+    document.getElementById('btnReset').addEventListener('click', () => {
+      edit.colors = DEFAULT_COLORS.slice();
+      edit.flipped = false;
+      edit.sheetBar = null;
+      window.track('colors_reset');
+      rerender();
     });
   }
 
@@ -430,6 +743,7 @@
     state.songId = null;
     noteEls = [];
     scrollEl = null;
+    if (!setupDone()) { renderSetup(); return; } // first visit: state the instrument once
     renderLibrary();
   }
 
