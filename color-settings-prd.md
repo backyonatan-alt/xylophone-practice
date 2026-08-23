@@ -39,9 +39,10 @@ One new **settings screen** ("התאמת צבעים") reachable from the library
 
 ## 5. Functional requirements
 
-### FR1 — Entry point
-- A quiet settings affordance on the library screen (e.g., small "🎨 הקסילופון שלכם נראה אחרת?" link near the footer note, and/or a gear icon in the header). Must not compete with song cards.
-- Not shown inside the song view (kid territory). Exact placement = design decision.
+### FR1 — Entry points: first-visit setup + persistent header button
+- **First visit (one-time):** before the library is first shown, a setup screen asks "האם הקסילופון שלכם נראה כך?" over an illustration of the default palette, with two choices: confirm ("כן, זה שלנו" → library, default saved) or "לא — נתאים את הצבעים" (→ the settings screen). The answer is persisted; the screen never appears again. This guarantees every family states their instrument up front — no discovery problem.
+- **Afterwards:** a persistent icon button (sliders icon) pinned to the library header, always visible regardless of how many songs are in the list (a link below the list would scroll out of view). Opens the same settings screen for manual changes at any time.
+- Not shown inside the song view (kid territory).
 
 ### FR2 — Flip toggle
 - Single control that reverses the order of whatever palette is active (default, preset, or custom).
@@ -57,6 +58,7 @@ One new **settings screen** ("התאמת צבעים") reachable from the library
 - Selecting a preset updates the main illustration immediately; nothing is saved until confirm (see FR6).
 
 ### FR4 — Custom colors
+- **Manual is not a separate mode and never starts from scratch:** it always edits the currently active palette — the chosen preset, or the default. A parent picks the closest preset first, then fixes the one or two bars that differ. Flip, preset choice, and manual edits compose into a single palette state.
 - Large xylophone (8 bars, low→high, LTR like everywhere in the app). Tap a bar → swatch sheet opens → tap a swatch → bar updates.
 - **Fixed swatch palette (~12), each with a pre-measured WCAG-AA label text color (`fg`).** Proposed starting set (contrast to be re-measured at implementation):
 
@@ -119,7 +121,7 @@ The chosen palette drives every colored element currently fed by the `BARS` arra
 
 ## 10. Open questions (for design)
 
-1. Entry point: footer link vs. header gear vs. both? First-run discovery — do we ever proactively ask "האם הקסילופון שלכם נראה כך?"
+1. ~~Entry point / first-run discovery~~ — **resolved:** one-time first-visit setup screen + persistent header icon button (see FR1).
 2. Are presets and flip separate sections, or is flip just a control on the preview illustration?
 3. Swatch sheet: bottom sheet vs. inline popover under the tapped bar?
 4. Final preset palettes — verify against the actual best-selling toys in IL market.

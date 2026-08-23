@@ -1,15 +1,17 @@
 {
   "artboards": [
-    { "file": "LibraryEntry.dc.html", "title": "Library — entry point", "x": 0, "y": 0, "w": 390, "h": 960 },
-    { "file": "Main.dc.html", "title": "Color settings", "x": 490, "y": 0, "w": 390, "h": 1160 },
-    { "file": "SwatchPicker.dc.html", "title": "Swatch picker (sheet open)", "x": 980, "y": 0, "w": 390, "h": 844 },
-    { "file": "DuplicateWarning.dc.html", "title": "Duplicate-color warning", "x": 1470, "y": 0, "w": 390, "h": 920 }
+    { "file": "FirstVisit.dc.html", "title": "First visit — setup", "x": 0, "y": 0, "w": 390, "h": 740 },
+    { "file": "LibraryEntry.dc.html", "title": "Library — entry point", "x": 490, "y": 0, "w": 390, "h": 920 },
+    { "file": "Main.dc.html", "title": "Color settings", "x": 980, "y": 0, "w": 390, "h": 1160 },
+    { "file": "SwatchPicker.dc.html", "title": "Swatch picker (sheet open)", "x": 1470, "y": 0, "w": 390, "h": 844 },
+    { "file": "DuplicateWarning.dc.html", "title": "Duplicate-color warning", "x": 1960, "y": 0, "w": 390, "h": 920 }
   ],
   "annotations": [
-    { "id": "entry-note", "x": 0, "y": -170, "w": 340, "text": "Entry point (PRD open Q1): shown as a quiet link-card after the song list. Alternative: a gear icon in the header — kept off to avoid competing with song cards / kid taps." },
-    { "id": "presets-note", "x": 490, "y": -170, "w": 360, "text": "Flip, presets and manual on one screen (PRD Q2: flip as a row above presets; the whole row is the tap target). Metal + pastel preset palettes are placeholders — verify against best-selling toys before build.\nManual bars are ~36px wide on a 390 frame — same as the app's shipped reference strip; their 54–82px height keeps the tap area comfortable.\nHappy path = tap a preset, tap save: 2 taps." },
-    { "id": "sheet-note", "x": 980, "y": -170, "w": 340, "text": "Swatch picker as a bottom sheet (PRD Q3) — bigger targets for one-handed use than a popover. 12 fixed swatches, each with a pre-measured label color; no free color wheel." },
-    { "id": "warning-note", "x": 1470, "y": -170, "w": 340, "text": "Duplicate colors: non-blocking warning (existing amber chip tokens), save stays enabled — some real toys do repeat colors. The two matching bars get an amber ring." }
+    { "id": "firstvisit-note", "x": 0, "y": -170, "w": 340, "text": "Shown once, on first launch: confirm the default xylophone or go straight into color matching. The answer is saved on the device; changeable any time from the sliders button on the library screen." },
+    { "id": "entry-note", "x": 490, "y": -170, "w": 340, "text": "Entry after first launch: a persistent icon button pinned to the header — always visible no matter how many songs (the earlier footer link scrolled out of view with a full song list)." },
+    { "id": "presets-note", "x": 980, "y": -190, "w": 360, "text": "Flip, presets and manual on one screen (flip row = whole-row tap target). Manual is not a separate mode: it always starts from the active palette (chosen preset or default) and edits one bar at a time. Metal + pastel preset palettes are placeholders — verify against best-selling toys before build.\nManual bars are ~36px wide on a 390 frame — same as the app's shipped reference strip; their 54–82px height keeps the tap area comfortable.\nHappy path = tap a preset, tap save: 2 taps." },
+    { "id": "sheet-note", "x": 1470, "y": -170, "w": 340, "text": "Swatch picker as a bottom sheet — bigger targets for one-handed use than a popover. 12 fixed swatches, each with a pre-measured label color; no free color wheel. Colors of the active preset always appear as swatches too." },
+    { "id": "warning-note", "x": 1960, "y": -170, "w": 340, "text": "Duplicate colors: non-blocking warning (existing amber chip tokens), save stays enabled — some real toys do repeat colors. The two matching bars get an amber ring." }
   ],
   "launch": { "view": "canvas" }
 }
